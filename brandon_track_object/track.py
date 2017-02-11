@@ -1,9 +1,9 @@
+# 
 from collections import deque
 import numpy as np
 import argparse
 import imutils
 import cv2
-
 
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -34,7 +34,6 @@ if not args.get("video", False):
 else:
 	camera = cv2.VideoCapture(args["video"])
 
-
 # keep looping
 while True:
 	# grab the current frame
@@ -64,8 +63,6 @@ while True:
 		cv2.CHAIN_APPROX_SIMPLE)[-2]
 	center = None
 
-
-
 	# only proceed if at least one contour was found
 	if len(cnts) > 0:
 		# find the largest contour in the mask, then use
@@ -84,9 +81,6 @@ while True:
 				(0, 255, 255), 2)
 			cv2.circle(frame, center, 5, (0, 0, 255), -1)
 			pts.appendleft(center)
-
-
-
 
 	# loop over the set of tracked points
 	for i in np.arange(1, len(pts)):
@@ -122,3 +116,30 @@ while True:
 			# otherwise, only one direction is non-empty
 			else:
 				direction = dirX if dirX != "" else dirY
+
+
+		# otherwise, compute the thickness of the line and
+		# draw the connecting lines
+		thickness = int(np.sqrt(args["buffer"] / float(i + 1)) * 2.5)
+		cv2.line(frame, pts[i - 1], pts[i], (0, 0, 255), thickness)
+ 
+	# show the movement deltas and the direction of movement on
+	# the frame
+	cv2.putText(frame, direction, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
+		0.65, (0, 0, 255), 3)
+	cv2.putText(frame, "dx: {}, dy: {}".format(dX, dY),
+		(10, frame.shape[0] - 10), cv2.FONT_HERSHEY_SIMPLEX,
+		0.35, (0, 0, 255), 1)
+ 
+	# show the frame to our screen and increment the frame counter
+	cv2.imshow("Frame", frame)
+	key = cv2.waitKey(1) & 0xFF
+	counter += 1
+ 
+	# if the 'q' key is pressed, stop the loop
+	if key == ord("q"):
+		break
+ 
+# cleanup the camera and close any open windows
+camera.release()
+cv2.destroyAllWindows()
