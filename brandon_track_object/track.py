@@ -15,13 +15,16 @@ args = vars(ap.parse_args())
 
 # define the lower and upper boundaries of the "green"
 # ball in the HSV color space
+
+# line 63 to change the color scheme
 greenLower = (29, 86, 6)
 greenUpper = (64, 255, 255)
 
 blueLower = (80, 90, 6)
 blueUpper = (120, 255, 255)
 
-
+redLower = (0, 150, 120)
+redUpper = (0, 255, 255)
 # initialize the list of tracked points, the frame counter,
 # and the coordinate deltas
 pts = deque(maxlen=args["buffer"])
@@ -57,7 +60,7 @@ while True:
 	# construct a mask for the color "green", then perform
 	# a series of dilations and erosions to remove any small
 	# blobs left in the mask
-	mask = cv2.inRange(hsv, blueLower, blueUpper)
+	mask = cv2.inRange(hsv, redLower, redUpper)
 	mask = cv2.erode(mask, None, iterations=2)
 	mask = cv2.dilate(mask, None, iterations=2)
  
